@@ -19,10 +19,10 @@ class LaravelGmailServiceProvider extends ServiceProvider
 
 		$this->mergeConfigFrom(__DIR__.'/config/gmail.php', 'gmail');
 
-		// Main Service
-		$this->app->bind('laravelgmail', function ($app) {
-			return new LaravelGmailClass($app['config']);
-		});
+		// // Main Service
+		// $this->app->bind('laravelgmail', function ($app) {
+		// 	return new LaravelGmailClass($app['config']);
+		// });
 
 	}
 }
