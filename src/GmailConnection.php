@@ -156,9 +156,9 @@ class GmailConnection extends Google_Client
         } else {
             MailAccount::create([
                 'user_id' => $userId,
-                'name' => 'testing',
                 'email' => $config['email'],
                 'token' => encrypt(json_encode($config)),
+                'account_type' => 'gmail',
             ]);
         }
 		// $disk = Storage::disk('local');
