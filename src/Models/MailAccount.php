@@ -15,6 +15,7 @@ class MailAccount extends Model
         'name',
         'email',
         'token',
+        'account_type',
     ];
 
     public function gmailService()
