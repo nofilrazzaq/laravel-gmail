@@ -50,17 +50,17 @@ trait Configurable
 
 	private function getFileName()
 	{
-		if (property_exists(get_class($this), 'userId') && $this->userId) {
-			$userId = $this->userId;
+		if (property_exists(get_class($this), 'mailAccountId') && $this->mailAccountId) {
+			$mailAccountId = $this->mailAccountId;
 		} elseif (auth()->user()) {
-			$userId = auth()->user()->id;
+			$mailAccountId = auth()->user()->id;
 		}
 
 		$credentialFilename = $this->_config['gmail.credentials_file_name'];
 		$allowMultipleCredentials = $this->_config['gmail.allow_multiple_credentials'];
 
-		if (isset($userId) && $allowMultipleCredentials) {
-			return sprintf('%s-%s', $credentialFilename, $userId);
+		if (isset($mailAccountId) && $allowMultipleCredentials) {
+			return sprintf('%s-%s', $credentialFilename, $mailAccountId);
 		}
 
 		return $credentialFilename;

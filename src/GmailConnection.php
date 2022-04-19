@@ -1,5 +1,5 @@
 <?php
-
+// sss
 namespace Dacastro4\LaravelGmail;
 
 use Dacastro4\LaravelGmail\Traits\Configurable;
@@ -22,13 +22,13 @@ class GmailConnection extends Google_Client
 	protected $accessToken;
 	protected $token;
 	private $configuration;
-	public $userId;
+	public $mailAccountId;
 
-	public function __construct($config = null, $userId = null)
+	public function __construct($config = null, $mailAccountId = null)
 	{
 		$this->app = Container::getInstance();
 
-		$this->userId = $userId;
+		$this->mailAccountId = $mailAccountId;
 
 		$this->configConstruct($config);
 

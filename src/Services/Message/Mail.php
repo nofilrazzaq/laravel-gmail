@@ -37,7 +37,7 @@ class Mail extends GmailConnection
 	/**
 	 * @var
 	 */
-	public $userId;
+	public $mailAccountId;
 
 	/**
 	 * @var
@@ -81,22 +81,22 @@ class Mail extends GmailConnection
 	 *
 	 * @param \Google_Service_Gmail_Message $message
 	 * @param bool $preload
-	 * @param  int 	$userId
+	 * @param  int 	$mailAccountId
 	 */
-	public function __construct(\Google_Service_Gmail_Message $message = null, $preload = false, $userId = null)
+	public function __construct(\Google_Service_Gmail_Message $message = null, $preload = false, $mailAccountId = null)
 	{
 		$this->service = new Google_Service_Gmail($this);
 
 		$this->__rConstruct();
 		$this->__mConstruct();
-		parent::__construct(config(), $userId);
+		parent::__construct(config(), $mailAccountId);
 
 		if (!is_null($message)) {
 			if ($preload) {
 				$message = $this->service->users_messages->get('me', $message->getId());
 			}
 
-			$this->setUserId($userId);
+			$this->setmailAccountId($mailAccountId);
 
 			$this->setMessage($message);
 
@@ -109,11 +109,11 @@ class Mail extends GmailConnection
 	/**
 	 * Set user Id
 	 *
-	 * @param int $userId
+	 * @param int $mailAccountId
 	 */
-	protected function setUserId($userId)
+	protected function setmailAccountId($mailAccountId)
 	{
-		$this->userId = $userId;
+		$this->mailAccountId = $mailAccountId;
 	}
 
 	/**
@@ -530,7 +530,7 @@ class Mail extends GmailConnection
 
 		foreach ($parts as $part) {
 			if (!empty($part->body->attachmentId)) {
-				$attachment = (new Attachment($part->body->attachmentId, $part, $this->userId));
+				$attachment = (new Attachment($part->body->attachmentId, $part, $this->mailAccountId));
 
 				if ($preload) {
 					$attachment = $attachment->getData();
