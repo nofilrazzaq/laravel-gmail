@@ -3,8 +3,9 @@
 namespace Dacastro4\LaravelGmail\Traits;
 
 use Google_Service_Gmail;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
+use Dacastro4\LaravelGmail\Models\MailAccount;
 
 /**
  * Trait Configurable
@@ -23,27 +24,40 @@ trait Configurable
 
 	public function config($string = null)
 	{
-		$disk = Storage::disk('local');
-		$fileName = $this->getFileName();
-		$file = "gmail/tokens/$fileName.json";
-		$allowJsonEncrypt = $this->_config['gmail.allow_json_encrypt'];
+		// $disk = Storage::disk('local');
+		// $fileName = $this->getFileName();
+		// $file = "gmail/tokens/$fileName.json";
+		// $allowJsonEncrypt = $this->_config['gmail.allow_json_encrypt'];
 
-		if ($disk->exists($file)) {
-			if ($allowJsonEncrypt) {
-				$config = json_decode(decrypt($disk->get($file)), true);
-			} else {
-				$config = json_decode($disk->get($file), true);
-			}
+		// if ($disk->exists($file)) {
+		// 	if ($allowJsonEncrypt) {
+		// 		$config = json_decode(decrypt($disk->get($file)), true);
+		// 	} else {
+		// 		$config = json_decode($disk->get($file), true);
+		// 	}
 
-			if ($string) {
+		// 	if ($string) {
+		// 		if (isset($config[$string])) {
+		// 			return $config[$string];
+		// 		}
+		// 	} else {
+		// 		return $config;
+		// 	}
+
+		// }
+
+        if(isset($this->mailAccountId)) {
+            $token = MailAccount::findOrFail($this->mailAccountId)->token;
+            $config = json_decode(decrypt($token), true);
+
+            if ($string) {
 				if (isset($config[$string])) {
 					return $config[$string];
 				}
 			} else {
 				return $config;
 			}
-
-		}
+        }
 
 		return null;
 	}
