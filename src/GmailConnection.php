@@ -2,6 +2,7 @@
 // sss
 namespace Dacastro4\LaravelGmail;
 
+use Dacastro4\LaravelGmail\Models\MailAccount;
 use Dacastro4\LaravelGmail\Traits\Configurable;
 use Google_Client;
 use Google_Service_Gmail;
@@ -133,54 +134,71 @@ class GmailConnection extends Google_Client
 	/**
 	 * @param $token
 	 */
-	public function setBothAccessToken($token)
+	public function setBothAccessToken($token, $userId = null)
 	{
 		$this->setAccessToken($token);
-		$this->saveAccessToken($token);
+		$this->saveAccessToken($token, $userId);
 	}
 
 	/**
-	 * Save the credentials in a file
+	 * Save the credentials in a database
 	 *
 	 * @param  array  $config
+	 * @param  string  $userId
 	 */
-	public function saveAccessToken(array $config)
+	public function saveAccessToken(array $config, string $userId)
 	{
-		$disk = Storage::disk('local');
-		$fileName = $this->getFileName();
-		$file = "gmail/tokens/$fileName.json";
-		$allowJsonEncrypt = $this->_config['gmail.allow_json_encrypt'];
-		$config['email'] = $this->emailAddress;
+        if(isset($this->mailAccountId)) {
+            $mailAccount = MailAccount::findOrFail($this->mailAccountId);
+            $mailAccount->update([
+                'token' => encrypt(json_encode($config))
+            ]);
+        } else {
+            MailAccount::create([
+                'user_id' => $userId,
+                'name' => 'testing',
+                'email' => $config['email'],
+                'token' => encrypt(json_encode($config)),
+            ]);
+        }
+		// $disk = Storage::disk('local');
+		// $fileName = $this->getFileName();
+		// $file = "gmail/tokens/$fileName.json";
+		// $allowJsonEncrypt = $this->_config['gmail.allow_json_encrypt'];
+		// $config['email'] = $this->emailAddress;
 
-		if ($disk->exists($file)) {
+		// if ($disk->exists($file)) {
 
-			if (empty($config['email'])) {
-				if ($allowJsonEncrypt) {
-					$savedConfigToken = json_decode(decrypt($disk->get($file)), true);
-				} else {
-					$savedConfigToken = json_decode($disk->get($file), true);
-				}
-				if(isset( $savedConfigToken['email'])) {
-					$config['email'] = $savedConfigToken['email'];
-				}
-			}
+		// 	if (empty($config['email'])) {
+		// 		if ($allowJsonEncrypt) {
+		// 			$savedConfigToken = json_decode(decrypt($disk->get($file)), true);
+		// 		} else {
+		// 			$savedConfigToken = json_decode($disk->get($file), true);
+		// 		}
+		// 		if(isset( $savedConfigToken['email'])) {
+		// 			$config['email'] = $savedConfigToken['email'];
+		// 		}
+		// 	}
 
-			$disk->delete($file);
-		}
+		// 	$disk->delete($file);
+		// }
 
-		if ($allowJsonEncrypt) {
-			$disk->put($file, encrypt(json_encode($config)));
-		} else {
-			$disk->put($file, json_encode($config));
-		}
+		// if ($allowJsonEncrypt) {
+		// 	$disk->put($file, encrypt(json_encode($config)));
+		// } else {
+		// 	$disk->put($file, json_encode($config));
+		// }
 
 	}
 
 	/**
+	 * makeToken
+	 *
+	 * @param  string $userId | user id to link mail account with
 	 * @return array|string
 	 * @throws \Exception
 	 */
-	public function makeToken()
+	public function makeToken(string $userId)
 	{
 		if (!$this->check()) {
 			$request = Request::capture();
@@ -194,7 +212,7 @@ class GmailConnection extends Google_Client
 						$accessToken['email'] = $me->emailAddress;
 					}
 				}
-				$this->setBothAccessToken($accessToken);
+				$this->setBothAccessToken($accessToken, $userId);
 
 				return $accessToken;
 			} else {
