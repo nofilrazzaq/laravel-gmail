@@ -47,7 +47,7 @@ class LaravelGmailClass extends GmailConnection
 	 *
 	 * @return \Google_Service_Gmail_Profile
 	 */
-	public function setmailAccountId($mailAccountId)
+	public function setMailAccountId($mailAccountId)
 	{
 		$this->mailAccountId = $mailAccountId;
 		return $this;

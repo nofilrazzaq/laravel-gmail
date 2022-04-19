@@ -96,7 +96,7 @@ class Mail extends GmailConnection
 				$message = $this->service->users_messages->get('me', $message->getId());
 			}
 
-			$this->setmailAccountId($mailAccountId);
+			$this->setMailAccountId($mailAccountId);
 
 			$this->setMessage($message);
 
@@ -111,7 +111,7 @@ class Mail extends GmailConnection
 	 *
 	 * @param int $mailAccountId
 	 */
-	protected function setmailAccountId($mailAccountId)
+	protected function setMailAccountId($mailAccountId)
 	{
 		$this->mailAccountId = $mailAccountId;
 	}
