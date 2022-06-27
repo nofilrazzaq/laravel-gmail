@@ -19,7 +19,7 @@ class MailAccount extends Model
         'history_id',
     ];
 
-    public function gmailService()
+    public function service()
     {
         return new LaravelGmailClass(config(), $this->id);
     }
