@@ -20,6 +20,7 @@ class CreateMailAccountsTable extends Migration
             $table->string('email');
             $table->longText('token')->nullable();
             $table->string('account_type');
+            $table->string('history_id')->nullable();
             $table->timestamps();
         });
     }
