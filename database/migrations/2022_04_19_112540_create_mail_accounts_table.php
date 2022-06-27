@@ -15,7 +15,7 @@ class CreateMailAccountsTable extends Migration
     {
         Schema::create('mail_accounts', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('user_id');
+            $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
             $table->string('name')->nullable();
             $table->string('email');
             $table->longText('token')->nullable();
