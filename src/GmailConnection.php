@@ -205,10 +205,13 @@ class GmailConnection extends Google_Client
 			$code = (string) $request->input('code', null);
 			if (!is_null($code) && !empty($code)) {
 				$accessToken = $this->fetchAccessTokenWithAuthCode($code);
-				if($this->haveReadScope()) {
+				if ($this->haveReadScope() && $this->haveSendScope()) {
 					$me = $this->getProfile();
 					if (property_exists($me, 'emailAddress')) {
 						$this->emailAddress = $me->emailAddress;
+                        if (!MailAccount::where('email', $this->emailAddress)->exists()) {
+                            throw new \Exception('This gmail account is already connected!');
+                        }
 						$accessToken['email'] = $me->emailAddress;
 					}
 				}
@@ -282,6 +285,13 @@ class GmailConnection extends Google_Client
 
 		return in_array(Google_Service_Gmail::GMAIL_READONLY, $scopes);
 	}
+
+    private function haveSendScope()
+    {
+        $scopes = $this->getUserScopes();
+
+        return in_array(Google_Service_Gmail::GMAIL_SEND, $scopes);
+    }
 
     /**
      * users.stop receiving push notifications for the given user mailbox.
