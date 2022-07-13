@@ -209,7 +209,7 @@ class GmailConnection extends Google_Client
 					$me = $this->getProfile();
 					if (property_exists($me, 'emailAddress')) {
 						$this->emailAddress = $me->emailAddress;
-                        if (!MailAccount::where('email', $this->emailAddress)->exists()) {
+                        if (MailAccount::where('email', $this->emailAddress)->exists()) {
                             throw new \Exception('This gmail account is already connected!');
                         }
 						$accessToken['email'] = $me->emailAddress;
