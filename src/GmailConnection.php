@@ -53,7 +53,7 @@ class GmailConnection extends Google_Client
 	public function checkPreviouslyLoggedIn()
 	{
         $mailAccount = MailAccount::find($this->mailAccountId);
-        if($mailAccount->exists()) {
+        if($mailAccount) {
 			$savedConfigToken = json_decode(decrypt($mailAccount->token), true);
             return !empty($savedConfigToken['access_token']);
         }
