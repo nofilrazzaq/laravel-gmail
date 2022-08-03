@@ -30,6 +30,8 @@ class GmailConnection extends Google_Client
 		$this->app = Container::getInstance();
 
 		$this->mailAccountId = $mailAccountId;
+        $this->mailAccount = MailAccount::find($this->mailAccountId);
+
 
 		$this->configConstruct($config);
 
@@ -52,9 +54,8 @@ class GmailConnection extends Google_Client
 	 */
 	public function checkPreviouslyLoggedIn()
 	{
-        $mailAccount = MailAccount::find($this->mailAccountId);
-        if($mailAccount) {
-			$savedConfigToken = json_decode(decrypt($mailAccount->token), true);
+        if($this->mailAccount) {
+			$savedConfigToken = json_decode(decrypt($this->mailAccount->token), true);
             return !empty($savedConfigToken['access_token']);
         }
 		return false;
@@ -70,6 +71,7 @@ class GmailConnection extends Google_Client
 		if ($this->isAccessTokenExpired()) {
 			$this->fetchAccessTokenWithRefreshToken($this->getRefreshToken());
 			$token = $this->getAccessToken();
+            $token['email'] = $this->mailAccount->email;
 			$this->setBothAccessToken($token);
 
 			return $token;
