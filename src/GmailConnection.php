@@ -134,9 +134,9 @@ class GmailConnection extends Google_Client
 	 * Save the credentials in a database
 	 *
 	 * @param  array  $config
-	 * @param  string  $userId
+	 * @param  string|null  $userId
 	 */
-	public function saveAccessToken(array $config, string $userId)
+	public function saveAccessToken(array $config, string|null $userId)
 	{
         $mailAccount = MailAccount::where('email', $config['email'])->where('user_id', $userId);
         if(isset($this->mailAccountId)) {
