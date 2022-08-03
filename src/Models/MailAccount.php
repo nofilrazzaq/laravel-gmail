@@ -17,6 +17,7 @@ class MailAccount extends Model
         'token',
         'account_type',
         'history_id',
+        'status',
     ];
 
     public function service()

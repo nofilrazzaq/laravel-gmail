@@ -52,21 +52,11 @@ class GmailConnection extends Google_Client
 	 */
 	public function checkPreviouslyLoggedIn()
 	{
-		$fileName = $this->getFileName();
-		$file = "gmail/tokens/$fileName.json";
-		$allowJsonEncrypt = $this->_config['gmail.allow_json_encrypt'];
-
-		if (Storage::disk('local')->exists($file)) {
-			if ($allowJsonEncrypt) {
-				$savedConfigToken = json_decode(decrypt(Storage::disk('local')->get($file)), true);
-			} else {
-				$savedConfigToken = json_decode(Storage::disk('local')->get($file), true);
-			}
-
-			return !empty($savedConfigToken['access_token']);
-
-		}
-
+        $mailAccount = MailAccount::find($this->mailAccountId);
+        if($mailAccount->exists()) {
+			$savedConfigToken = json_decode(decrypt($mailAccount->token), true);
+            return !empty($savedConfigToken['access_token']);
+        }
 		return false;
 	}
 
@@ -148,10 +138,17 @@ class GmailConnection extends Google_Client
 	 */
 	public function saveAccessToken(array $config, string $userId)
 	{
+        $mailAccount = MailAccount::where('email', $config['email'])->where('user_id', $userId);
         if(isset($this->mailAccountId)) {
             $mailAccount = MailAccount::findOrFail($this->mailAccountId);
             $mailAccount->update([
-                'token' => encrypt(json_encode($config))
+                'token' => encrypt(json_encode($config)),
+                'status' => 'active'
+            ]);
+        } else if($mailAccount->exists()) {
+            $mailAccount->first()->update([
+                'token' => encrypt(json_encode($config)),
+                'status' => 'active'
             ]);
         } else {
             MailAccount::create([
@@ -159,6 +156,7 @@ class GmailConnection extends Google_Client
                 'email' => $config['email'],
                 'token' => encrypt(json_encode($config)),
                 'account_type' => 'gmail',
+                'status' => 'active'
             ]);
         }
 		// $disk = Storage::disk('local');
@@ -209,9 +207,9 @@ class GmailConnection extends Google_Client
 					$me = $this->getProfile();
 					if (property_exists($me, 'emailAddress')) {
 						$this->emailAddress = $me->emailAddress;
-                        if (MailAccount::where('email', $this->emailAddress)->exists()) {
-                            throw new \Exception('This gmail account is already connected!');
-                        }
+                        // if (MailAccount::where('email', $this->emailAddress)->exists()) {
+                        //     throw new \Exception('This gmail account is already connected!');
+                        // }
 						$accessToken['email'] = $me->emailAddress;
 					}
 				}
