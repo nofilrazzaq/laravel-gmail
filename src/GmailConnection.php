@@ -2,13 +2,14 @@
 // sss
 namespace Dacastro4\LaravelGmail;
 
-use Dacastro4\LaravelGmail\Models\MailAccount;
-use Dacastro4\LaravelGmail\Traits\Configurable;
 use Google_Client;
 use Google_Service_Gmail;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Storage;
+use Dacastro4\LaravelGmail\Models\MailAccount;
+use Dacastro4\LaravelGmail\Traits\Configurable;
+use App\Exceptions\Api\Google\GmailApiException;
 
 class GmailConnection extends Google_Client
 {
@@ -69,7 +70,10 @@ class GmailConnection extends Google_Client
 	private function refreshTokenIfNeeded()
 	{
 		if ($this->isAccessTokenExpired()) {
-			$this->fetchAccessTokenWithRefreshToken($this->getRefreshToken());
+			$creds = $this->fetchAccessTokenWithRefreshToken($this->getRefreshToken());
+            if(!$creds || isset($creds['error'])) {
+                return $this->token;
+            }
 			$token = $this->getAccessToken();
             $token['email'] = $this->mailAccount->email;
 			$this->setBothAccessToken($token);
